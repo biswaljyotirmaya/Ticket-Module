@@ -14,10 +14,8 @@ declare var bootstrap: any;
   imports: [CommonModule, FormsModule]
 })
 export class TicketCrudComponent implements OnInit {
+
   tickets: any[] = [];
-  pagedTickets: any[] = [];
-  currentPage = 1;
-  pageSize = 13;
 
   ticket = {
     sno: '',
@@ -43,23 +41,9 @@ export class TicketCrudComponent implements OnInit {
     this.ticketService.getAllTickets().subscribe({
       next: data => {
         this.tickets = data;
-        this.updatePagedTickets();
       },
       error: err => alert('Error fetching tickets')
     });
-  }
-
-  updatePagedTickets() {
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.pagedTickets = this.tickets.slice(start, end);
-  }
-
-  changePage(page: number) {
-    if (page >= 1 && page <= Math.ceil(this.tickets.length / this.pageSize)) {
-      this.currentPage = page;
-      this.updatePagedTickets();
-    }
   }
 
   createTicket() {
