@@ -1,1 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* src/styles.css */
+@import "quill/dist/quill.bubble.css"; /* For bubble theme (or quill.snow.css for toolbar) */
+@import "quill/dist/quill.core.css";
+@import "quill/dist/quill.snow.css";
+
+
+/* Optional: Adjust Quill editor appearance */
+.ql-editor {
+  min-height: 150px;
+  border: 1px solid #ced4da; /* Match Bootstrap input border */
+  border-radius: 0.25rem; /* Match Bootstrap input border-radius */
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: #f8f9fa; /* Light background */
+}
+
+.ql-container.ql-bubble:not(.ql-disabled) a::before {
+  content: none !important; /* Remove Quill's default link tooltip */
+}
