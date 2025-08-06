@@ -1,4 +1,3 @@
-// src/app/service/relationship.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -15,7 +14,7 @@ export class RelationshipService {
     return this.http.get<any[]>(`${BASE_URL_RELATIONSHIPS}/by-source-ticket/${sourceTicketId}`);
   }
 
-  createRelationship(relationship: any): Observable<any> {
+  createRelationship(relationship: { type: string; targetTicketId: number; sourceTicket: { id: number } }): Observable<any> {
     return this.http.post(BASE_URL_RELATIONSHIPS, relationship);
   }
 

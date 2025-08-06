@@ -1,118 +1,3 @@
-// import { Component, OnInit, inject } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { TicketService } from '../service/ticket.service';
-
-// declare var bootstrap: any;
-
-// @Component({
-//   selector: 'app-ticket-crud',
-//   templateUrl: './ticket-crud.component.html',
-//   styleUrls: ['./ticket-crud.component.css'],
-//   standalone: true,
-//   imports: [CommonModule, FormsModule]
-// })
-// export class TicketCrudComponent implements OnInit {
-
-//   tickets: any[] = [];
-
-//   ticket = {
-//     sno: '',
-//     titleTicket: '',
-//     assign: '',
-//     status: '',
-//     priority: '',
-//     dateCurrent: '',
-//     subTask: ''
-//   };
-
-//   deleteSno: string = '';
-
-//   private route = inject(ActivatedRoute);
-//   private router = inject(Router);
-//   private ticketService = inject(TicketService);
-
-//   ngOnInit() {
-//     this.getTickets();
-//   }
-
-//   getTickets() {
-//     this.ticketService.getAllTickets().subscribe({
-//       next: data => {
-//         this.tickets = data;
-//       },
-//       error: err => alert('Error fetching tickets')
-//     });
-//   }
-
-//   createTicket() {
-//     this.ticketService.createTicket(this.ticket).subscribe({
-//       next: () => {
-//         this.getTickets();
-//         this.resetForm();
-//         alert('Ticket created successfully!');
-//       },
-//       error: err => alert('Error creating ticket')
-//     });
-//   }
-
-//   openEditModal(ticket: any) {
-//     this.ticket = { ...ticket };
-//     const modalEl = document.getElementById('editTicketModal');
-//     if (modalEl) {
-//       const modal = new bootstrap.Modal(modalEl);
-//       modal.show();
-//     }
-//   }
-
-//   updateTicket() {
-//     this.ticketService.updateTicket(this.ticket.sno, this.ticket).subscribe({
-//       next: () => {
-//         this.getTickets();
-//         this.resetForm();
-//         alert('Ticket updated successfully!');
-//       },
-//       error: err => alert('Error updating ticket')
-//     });
-//   }
-
-//   confirmDelete(sno: string) {
-//     this.deleteSno = sno;
-//     const modalEl = document.getElementById('deleteConfirmModal');
-//     if (modalEl) {
-//       const modal = new bootstrap.Modal(modalEl);
-//       modal.show();
-//     }
-//   }
-
-//   deleteTicket() {
-//     this.ticketService.deleteTicket(this.deleteSno).subscribe({
-//       next: () => {
-//         this.getTickets();
-//         alert('Ticket deleted successfully!');
-//       },
-//       error: err => alert('Error deleting ticket')
-//     });
-//   }
-
-//   resetForm() {
-//     this.ticket = {
-//       sno: '',
-//       titleTicket: '',
-//       assign: '',
-//       status: '',
-//       priority: '',
-//       dateCurrent: '',
-//       subTask: ''
-//     };
-//   }
-
-//   goToTicketPanel(ticketId: string) {
-//     this.router.navigate(['/ticket', ticketId]);
-//   }
-// }
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -120,6 +5,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TicketService } from '../service/ticket.service';
 
 declare var bootstrap: any;
+
+interface Ticket {
+  id?: number; // optional for create
+  titleTicket: string;
+  assign: string;
+  status: string;
+  priority: string;
+  dateCurrent: string;
+  description: string;
+}
 
 @Component({
   selector: 'app-ticket-crud',
@@ -129,19 +24,19 @@ declare var bootstrap: any;
   imports: [CommonModule, FormsModule],
 })
 export class TicketCrudComponent implements OnInit {
-  tickets: any[] = [];
+  tickets: Ticket[] = [];
 
-  ticket = {
-    sno: '',
-    titleTicket: '',
-    assign: '',
-    status: '',
-    priority: '',
-    dateCurrent: '',
-    description: '', // Changed from subTask
-  };
+  ticket: Ticket = {
+  titleTicket: '',
+  assign: '',
+  status: '',
+  priority: '',
+  dateCurrent: '',
+  description: '',
+};
 
-  deleteSno: string = '';
+
+  deleteId: number | null = null;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -156,7 +51,7 @@ export class TicketCrudComponent implements OnInit {
       next: (data) => {
         this.tickets = data;
       },
-      error: (err) => alert('Error fetching tickets'),
+      error: () => alert('Error fetching tickets'),
     });
   }
 
@@ -167,17 +62,15 @@ export class TicketCrudComponent implements OnInit {
         this.resetForm();
         alert('Ticket created successfully!');
       },
-      error: (err) => alert('Error creating ticket'),
+      error: () => alert('Error creating ticket'),
     });
   }
 
-  openEditModal(ticket: any) {
+  openEditModal(ticket: Ticket) {
     this.ticket = { ...ticket };
-    // Convert dateCurrent to 'YYYY-MM-DD' format for date input
+    // Format date for date input YYYY-MM-DD
     if (this.ticket.dateCurrent) {
-      this.ticket.dateCurrent = new Date(this.ticket.dateCurrent)
-        .toISOString()
-        .substring(0, 10);
+      this.ticket.dateCurrent = new Date(this.ticket.dateCurrent).toISOString().substring(0, 10);
     }
     const modalEl = document.getElementById('editTicketModal');
     if (modalEl) {
@@ -187,18 +80,22 @@ export class TicketCrudComponent implements OnInit {
   }
 
   updateTicket() {
-    this.ticketService.updateTicket(this.ticket.sno, this.ticket).subscribe({
+    if (!this.ticket.id) {
+      alert('Ticket ID missing!');
+      return;
+    }
+    this.ticketService.updateTicket(this.ticket.id.toString(), this.ticket).subscribe({
       next: () => {
         this.getTickets();
         this.resetForm();
         alert('Ticket updated successfully!');
       },
-      error: (err) => alert('Error updating ticket'),
+      error: () => alert('Error updating ticket'),
     });
   }
 
-  confirmDelete(sno: string) {
-    this.deleteSno = sno;
+  confirmDelete(id: number) {
+    this.deleteId = id;
     const modalEl = document.getElementById('deleteConfirmModal');
     if (modalEl) {
       const modal = new bootstrap.Modal(modalEl);
@@ -207,28 +104,28 @@ export class TicketCrudComponent implements OnInit {
   }
 
   deleteTicket() {
-    this.ticketService.deleteTicket(this.deleteSno).subscribe({
+    if (this.deleteId === null) return;
+    this.ticketService.deleteTicket(this.deleteId).subscribe({
       next: () => {
         this.getTickets();
         alert('Ticket deleted successfully!');
       },
-      error: (err) => alert('Error deleting ticket'),
+      error: () => alert('Error deleting ticket'),
     });
   }
 
   resetForm() {
     this.ticket = {
-      sno: '',
       titleTicket: '',
       assign: '',
       status: '',
       priority: '',
       dateCurrent: '',
-      description: '', // Changed from subTask
+      description: '',
     };
   }
 
-  goToTicketPanel(ticketId: string) {
+  goToTicketPanel(ticketId: number) {
     this.router.navigate(['/ticket', ticketId]);
   }
 }
