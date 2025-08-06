@@ -513,7 +513,7 @@ class TicketControllerTest {
         Ticket ticket = createSampleTicket();
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        mockMvc.perform(get("/api/tickets/" + savedTicket.getSno()))
+        mockMvc.perform(get("/api/tickets/" + savedTicket.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.titleTicket").value("Test Ticket"))
                 .andExpect(jsonPath("$.assign").value("John Doe"))
@@ -540,7 +540,7 @@ class TicketControllerTest {
         updateTicket.setDescription("Updated task description"); // Changed setSubTask to setDescription
         String updateJson = objectMapper.writeValueAsString(updateTicket);
 
-        mockMvc.perform(put("/api/tickets/" + savedTicket.getSno())
+        mockMvc.perform(put("/api/tickets/" + savedTicket.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson))
                 .andExpect(status().isOk())
@@ -571,7 +571,7 @@ class TicketControllerTest {
         updateTicket.setTitleTicket(null); // Invalid
         String updateJson = objectMapper.writeValueAsString(updateTicket);
 
-        mockMvc.perform(put("/api/tickets/" + savedTicket.getSno())
+        mockMvc.perform(put("/api/tickets/" + savedTicket.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson))
                 .andExpect(status().isBadRequest())
@@ -583,11 +583,11 @@ class TicketControllerTest {
         Ticket ticket = createSampleTicket();
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        mockMvc.perform(delete("/api/tickets/" + savedTicket.getSno()))
+        mockMvc.perform(delete("/api/tickets/" + savedTicket.getId()))
                 .andExpect(status().isNoContent());
 
         // Verify ticket is deleted
-        mockMvc.perform(get("/api/tickets/" + savedTicket.getSno()))
+        mockMvc.perform(get("/api/tickets/" + savedTicket.getId()))
                 .andExpect(status().isNotFound());
     }
 
@@ -643,10 +643,10 @@ class TicketControllerTest {
         ticket.setPdfData("dummy_pdf_content".getBytes()); // Set dummy PDF data
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        mockMvc.perform(get("/api/tickets/{id}/download-pdf", savedTicket.getSno()))
+        mockMvc.perform(get("/api/tickets/{id}/download-pdf", savedTicket.getId()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_PDF_VALUE))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"ticket_" + savedTicket.getSno() + ".pdf\""))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"ticket_" + savedTicket.getId() + ".pdf\""))
                 .andExpect(content().bytes("dummy_pdf_content".getBytes()));
     }
 
@@ -663,10 +663,10 @@ class TicketControllerTest {
         ticket.setDocxData("dummy_docx_content".getBytes()); // Set dummy DOCX data
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        mockMvc.perform(get("/api/tickets/{id}/download-docx", savedTicket.getSno()))
+        mockMvc.perform(get("/api/tickets/{id}/download-docx", savedTicket.getId()))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"ticket_" + savedTicket.getSno() + ".docx\""))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"ticket_" + savedTicket.getId() + ".docx\""))
                 .andExpect(content().bytes("dummy_docx_content".getBytes()));
     }
 
@@ -683,14 +683,14 @@ class TicketControllerTest {
         Ticket savedTicket = ticketRepository.save(ticket);
         String newDescription = "Patched description via PATCH";
 
-        mockMvc.perform(patch("/api/tickets/{id}", savedTicket.getSno())
+        mockMvc.perform(patch("/api/tickets/{id}", savedTicket.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(java.util.Collections.singletonMap("description", newDescription))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value(newDescription));
 
         // Verify it's updated in DB
-        Ticket updatedTicket = ticketRepository.findById(savedTicket.getSno()).orElseThrow();
+        Ticket updatedTicket = ticketRepository.findById(savedTicket.getId()).orElseThrow();
         assertEquals(newDescription, updatedTicket.getDescription());
     }
 

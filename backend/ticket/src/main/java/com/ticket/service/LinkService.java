@@ -1,39 +1,54 @@
 package com.ticket.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import com.ticket.entity.Link;
-import com.ticket.entity.Ticket;
-import com.ticket.exception.LinkNotFoundException; // You'll need to create this exception
-import com.ticket.repository.LinkRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.ticket.dto.LinkDTO;
+import com.ticket.entity.Link;
+import com.ticket.entity.Ticket;
+import com.ticket.exception.LinkNotFoundException;
+import com.ticket.mapper.LinkMapper;
+import com.ticket.repository.LinkRepository;
+import com.ticket.repository.TicketRepository;
 
 @Service
 @Transactional
 public class LinkService {
+
     private final LinkRepository linkRepository;
-    private final TicketService ticketService; // To fetch parent ticket
+    private final TicketRepository ticketRepository;
 
-    public LinkService(LinkRepository linkRepository, TicketService ticketService) {
+    public LinkService(LinkRepository linkRepository, TicketRepository ticketRepository) {
         this.linkRepository = linkRepository;
-        this.ticketService = ticketService;
+        this.ticketRepository = ticketRepository;
     }
 
-    public Link saveLink(Link link) {
-        return linkRepository.save(link);
+    public LinkDTO saveLink(LinkDTO dto) {
+        Link link = LinkMapper.toEntity(dto);
+        if (dto.getParentTicketId() != null) {
+            Ticket parent = ticketRepository.findById(dto.getParentTicketId())
+                    .orElseThrow(() -> new LinkNotFoundException("Parent Ticket not found with ID: " + dto.getParentTicketId()));
+            link.setParentTicket(parent);
+        }
+        Link saved = linkRepository.save(link);
+        return LinkMapper.toDTO(saved);
     }
 
-    public List<Link> getLinksByParentTicket(Long ticketId) {
-        Ticket parentTicket = ticketService.getTicketById(ticketId)
-                                .orElseThrow(() -> new LinkNotFoundException("Parent Ticket not found with ID: " + ticketId));
-        return linkRepository.findByParentTicket(parentTicket);
+    public List<LinkDTO> getLinksByParentTicket(Long ticketId) {
+        Ticket parentTicket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new LinkNotFoundException("Parent Ticket not found with ID: " + ticketId));
+        return linkRepository.findByParentTicket(parentTicket)
+                .stream()
+                .map(LinkMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Link> getLinkById(Long id) {
-        return linkRepository.findById(id);
+    public Optional<LinkDTO> getLinkById(Long id) {
+        return linkRepository.findById(id).map(LinkMapper::toDTO);
     }
 
     public void deleteLink(Long id) {

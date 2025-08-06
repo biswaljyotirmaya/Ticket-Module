@@ -1,2 +1,8 @@
+com\ticket\controller\SubTicketControllerTest.class
+com\ticket\controller\TicketControllerTest.class
+com\ticket\repository\SubTicketRepositoryTest.class
 com\ticket\config\TestConfig.class
-com\ticket\TicketApplicationTests.class
+com\ticket\integration\SubTicketIntegrationTest.class
+com\ticket\service\SubTicketServiceTest.class
+com\ticket\repository\TicketRepositoryTest.class
+com\ticket\service\TicketServiceTest.class

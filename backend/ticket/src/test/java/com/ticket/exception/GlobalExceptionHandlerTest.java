@@ -134,30 +134,18 @@
 
 package com.ticket.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticket.entity.Ticket; // Not directly used in the handler test but might be present in a real scenario
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest; // Remove if not performing MVC tests
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType; // Not directly used in the handler test
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc; // Remove if not performing MVC tests
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.test.web.servlet.MockMvc; // Remove if not performing MVC tests
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-// Removed unnecessary MockMvc imports as this is a unit test of the handler itself, not through MockMvc calls
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(GlobalExceptionHandler.class) // If you only test the handler methods directly, @WebMvcTest might be overkill. @ExtendWith(MockitoExtension.class) + direct calls would be simpler. Keeping it if your actual setup uses it.

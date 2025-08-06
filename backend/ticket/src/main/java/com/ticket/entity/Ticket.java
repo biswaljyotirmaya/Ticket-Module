@@ -1,203 +1,29 @@
-//package com.ticket.entity;
-//
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-//import jakarta.persistence.*;
-//import jakarta.validation.constraints.NotBlank;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import lombok.AllArgsConstructor;
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//@Entity
-//@Table(name = "tickets")
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
-//public class Ticket {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long sno;
-//
-//    @NotBlank(message = "Title is required")
-//    @Column(nullable = false)
-//    private String titleTicket;
-//
-//    @NotBlank(message = "Assignee is required")
-//    @Column(nullable = false)
-//    private String assign;
-//
-//    @NotBlank(message = "Status is required")
-//    @Column(nullable = false)
-//    private String status;
-//
-//    @NotBlank(message = "Priority is required")
-//    @Column(nullable = false)
-//    private String priority;
-//
-//    @Column(nullable = false)
-//    private LocalDate dateCurrent;
-//
-//    @Column(columnDefinition = "TEXT")
-//    private String subTask;
-//
-//    // Remove subTasks and parent fields, add OneToMany to SubTicket
-//    @OneToMany(mappedBy = "parentTicket")
-//    @JsonIgnore
-//    private List<SubTicket> subTickets;
-//
-//    @PrePersist
-//    protected void onCreate() {
-//        if (dateCurrent == null) {
-//            dateCurrent = LocalDate.now();
-//        }
-//    }
-//}
-
-
-//==============================================================================
-
-//package com.ticket.entity;
-//
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-//import jakarta.persistence.*;
-//import jakarta.validation.constraints.NotBlank;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import lombok.AllArgsConstructor;
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//@Entity
-//@Table(name = "tickets")
-//@Data	
-//@NoArgsConstructor
-//@AllArgsConstructor
-//public class Ticket {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long sno;
-//
-//    @NotBlank(message = "Title is required")
-//    @Column(nullable = false)
-//    private String titleTicket;
-//
-//    @NotBlank(message = "Assignee is required")
-//    @Column(nullable = false)
-//    private String assign;
-//
-//    @NotBlank(message = "Status is required")
-//    @Column(nullable = false)
-//    private String status;
-//
-//    @NotBlank(message = "Priority is required")
-//    @Column(nullable = false)
-//    private String priority;
-//
-//    @Column(nullable = false)
-//    private LocalDate dateCurrent;
-//
-//    @Column(columnDefinition = "TEXT")
-//    private String description; // Renamed from subTask for clarity, storing rich text (HTML)
-//
-//    @OneToMany(mappedBy = "parentTicket", cascade = CascadeType.ALL, orphanRemoval = true) // Added cascade and orphanRemoval for subtasks
-//    @JsonIgnore
-//    private List<SubTicket> subTickets;
-//
-//    @PrePersist
-//    protected void onCreate() {
-//        if (dateCurrent == null) {
-//            dateCurrent = LocalDate.now();
-//        }
-//    }
-//}
-
-
-
-
-
-//============================================
-//package com.ticket.entity;
-//
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-//import jakarta.persistence.*;
-//import jakarta.validation.constraints.NotBlank;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import lombok.AllArgsConstructor;
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//@Entity
-//@Table(name = "tickets")
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
-//public class Ticket {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long sno;
-//
-//    @NotBlank(message = "Title is required")
-//    @Column(nullable = false)
-//    private String titleTicket;
-//
-//    @NotBlank(message = "Assignee is required")
-//    @Column(nullable = false)
-//    private String assign;
-//
-//    @NotBlank(message = "Status is required")
-//    @Column(nullable = false)
-//    private String status;
-//
-//    @NotBlank(message = "Priority is required")
-//    @Column(nullable = false)
-//    private String priority;
-//
-//    @Column(nullable = false)
-//    private LocalDate dateCurrent;
-//    
-//    @Lob  // For large text objects (HTML from Quill)
-//    @Column(columnDefinition = "TEXT")
-//    private String description; // Renamed from subTask for clarity, storing rich text (HTML)
-//
-//    @OneToMany(mappedBy = "parentTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
-//    private List<SubTicket> subTickets;
-//
-//    @OneToMany(mappedBy = "parentTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
-//    private List<Link> links; // New: List of associated links
-//
-//    @OneToMany(mappedBy = "sourceTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JsonIgnore
-//    private List<Relationship> relationships; // New: List of outgoing relationships
-//
-//    @PrePersist
-//    protected void onCreate() {
-//        if (dateCurrent == null) {
-//            dateCurrent = LocalDate.now();
-//        }
-//    }
-//}
-
-
-
-
-//===================================================================
 package com.ticket.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -207,8 +33,9 @@ import java.util.List;
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long sno;
+    @GeneratedValue(generator = "shared-seq")
+    @GenericGenerator(name = "shared-seq", strategy = "com.ticket.generator.SharedSequenceGenerator")
+    private Long id;
 
     @NotBlank(message = "Title is required")
     @Column(nullable = false)
@@ -229,29 +56,27 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDate dateCurrent;
 
-    @Lob // For large text objects (HTML from Quill)
-    @Column(columnDefinition = "LONGTEXT") // Use LONGTEXT for very large HTML content
-    private String description; // Stores rich text (HTML)
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
 
-    @Lob // For large binary objects (PDF file)
+    @Lob
     @Column(name = "pdf_data", columnDefinition="LONGBLOB")
-    private byte[] pdfData; // Stores the PDF binary data
+    private byte[] pdfData;
 
-    @Lob // For large binary objects (DOCX file)
+    @Lob
     @Column(name = "docx_data", columnDefinition="LONGBLOB")
-    private byte[] docxData; // Stores the DOCX binary data
+    private byte[] docxData;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "parent_ticket_id")
+    private Ticket parentTicket;
+
 
     @OneToMany(mappedBy = "parentTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<SubTicket> subTickets;
-
-    @OneToMany(mappedBy = "parentTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Link> links;
-
-    @OneToMany(mappedBy = "sourceTicket", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Relationship> relationships;
+    @JsonManagedReference
+    private List<Ticket> subTickets = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -260,5 +85,3 @@ public class Ticket {
         }
     }
 }
-
-
